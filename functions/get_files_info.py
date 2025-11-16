@@ -3,7 +3,7 @@ import os
 def get_files_info(working_directory, directory="."):
     abs_working = os.path.abspath(working_directory)
     abs_target = os.path.abspath(os.path.join(working_directory, directory))
-    check_inside = os.path.commonpath([abs_working, abs_target]) == abs_working
+    check_inside = os.path.exists(abs_target)
     check_dir = os.path.isdir(abs_target)
     if not check_inside:
         return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
