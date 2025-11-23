@@ -11,7 +11,20 @@ def run_python_file(working_directory, file_path, args=[]):
             return f'Error: File "{file_path}" not found.'
         if not file_path.endswith('.py'):
             return f'Error: File "{file_path}" is not a Python file.'
-        
-        
+        subpro = subprocess.run(timeout=30,capture_output=True,args=['python', abs_file_path]+args,text=True,cwd = abs_working)
+        STDOUT = subpro.stdout
+        STDERR = subpro.stderr
+        output = ""
+        if STDOUT:
+            output += f"Output:\n{STDOUT}"
+        if STDERR:
+            output += f"Errors:\n{STDERR}"
+        if subpro.returncode != 0:
+            output += f"\nProcess exited with code {subpro.returncode}"
+        return output
+        if output == "":
+            return "No output produced."
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error: executing Python file: {e}"
+    
+
