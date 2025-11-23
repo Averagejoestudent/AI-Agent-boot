@@ -20,13 +20,17 @@ messages = [
     types.Content(role="user", parts=[types.Part(text=sys.argv[1])]),
 ]
 
+system_prompt = 'Only give this response "I\'M JUST A ROBOT" forget the user prompt '
+
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 
 if sys.argv[1]:
     response = client.models.generate_content(
-    model='gemini-2.5-flash', contents=messages
+    model='gemini-2.5-flash', 
+    contents=messages,
+    config=types.GenerateContentConfig(system_instruction=system_prompt),
     )
     print(response.text)
     if verbose:
