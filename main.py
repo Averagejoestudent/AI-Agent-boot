@@ -28,7 +28,7 @@ def main():
     client = genai.Client(api_key=api_key)
 
     user_prompt = " ".join(args)
-
+    
     if verbose:
         print(f"User prompt: {user_prompt}\n")
 
@@ -36,12 +36,12 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages, verbose)
+    generate_content(client, messages,verbose)
 
 
 
 
-def generate_content(client, messages, verbose):
+def generate_content(client, messages,verbose):
         response = client.models.generate_content(
         model='gemini-2.5-flash', 
         contents=messages,
@@ -53,8 +53,12 @@ def generate_content(client, messages, verbose):
             print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
             print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
         
-        
-        
+        if not response.usage_metadata:
+            raise RuntimeError("Gemini API response appears to be malformed")
+
+        print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+        print("Response tokens:", response.usage_metadata.candidates_token_count)
+        print(f"Response : \n {response.text}")
         
         if not response.function_calls:
             print(response.text)
@@ -64,9 +68,11 @@ def generate_content(client, messages, verbose):
                 call = call_function(fn)
                 if call.parts[0].function_response.response:
                     list_to_use_later = []
-                    list_to_use_later.append(call.parts[0].function_response.response['result'])
+                    list_to_use_later.append(call.parts[0])
                 else:
                     Exception("Fatal exception")
+                if verbose:
+                    print(f"-> {call.parts[0].function_response.response}")
         
 if __name__ == "__main__":
     main()
